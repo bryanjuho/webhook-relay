@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          bin: ...
+          bin: webhook_relay
           target: ${{ matrix.target }}
           tar: unix
           zip: windows
