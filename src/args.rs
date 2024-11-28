@@ -12,9 +12,9 @@ pub struct Args {
         help = "Interval in seconds between polls",
         value_name = "SECONDS"
     )]
-    pub poll_interval: u64,
+    pub interval: u64,
 
-    // URL to poll (GET request)
+    // Source URL to poll (GET request)
     #[arg(
         short,
         long,
@@ -22,7 +22,7 @@ pub struct Args {
         help = "Source URL to poll for data",
         value_name = "SOURCE_URL"
     )]
-    pub url: String,
+    pub source_url: String,
 
     // URL to post to on successful poll
     #[arg(
@@ -33,4 +33,18 @@ pub struct Args {
         value_name = "TARGET_URL"
     )]
     pub target_url: String,
+
+    #[arg(
+        short = 'H',
+        long = "source-headers",
+        help = "Headers for Source URL as JSON string (e.g. '{\"Authorization\": \"Bearer token\", \"X-Custom\": \"value\"}'"
+    )]
+    pub source_headers: Option<String>,
+
+    #[arg(
+        short = 'J',
+        long = "target-headers",
+        help = "Headers for Target URL as JSON string (e.g. '{\"Authorization\": \"Bearer token\", \"X-Custom\": \"value\"}'"
+    )]
+    pub target_headers: Option<String>,
 }
