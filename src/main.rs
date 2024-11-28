@@ -8,11 +8,14 @@ mod headers;
 use args::Args;
 use clap::Parser;
 use client::ApiClient;
+use log::{info, error};
 
 use headers::build_headers;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
     let args = Args::parse();
     let client = ApiClient::new();
     
@@ -20,26 +23,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let source_headers = build_headers(&args.source_headers)?;
     let target_headers = build_headers(&args.target_headers)?;
 
-    println!(
-        "Starting to poll {} every {} seconds...",
-        args.source_url, args.interval
-    );
-    println!("Will post to {} on success", args.target_url);
+    info!("Polling source URL: {} every {} seconds", args.source_url, args.interval);
 
     loop {
         match client.poll_url(&args.source_url, &source_headers).await {
             Ok(text) => {
-                println!("Received response: {}", text);
+                info!("Received response from source URL.");
 
                 match client
                     .post_response(&args.target_url, &target_headers, &text)
                     .await
                 {
-                    Ok(_) => println!("Sent to target URL"),
-                    Err(e) => println!("Failed to POST to target URL: {}", e),
+                    Ok(_) => info!("POST complete to target URL {}", &args.target_url),
+                    Err(e) => error!("POST failed to target URL: {}", e),
                 }
             }
-            Err(e) => println!("Request failed: {}", e),
+            Err(e) => error!("Failed to poll source URL: {}", e),
         }
 
         sleep(poll_interval).await;
