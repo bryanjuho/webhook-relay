@@ -14,10 +14,7 @@ A Rust CLI tool that polls a URL at specified intervals and forwards successful 
 
 ```bash
 # Basic usage with default source URL
-cargo run -- -t https://target-api.com
-
-# Custom source URL and polling interval
-cargo run -- -u https://source-api.com -t https://target-api.com -p 10
-
-# Show help
-cargo run -- --help
+cargo run -- \
+ --source-url http://10.0.0.4:8000/agents/a3c050a4a18da626091184a31c4c5aeca3482362/get_request/ \
+ --target-url http://10.0.0.4:8005/ \
+ --final-url http://10.0.0.4:8000/agents/a3c050a4a18da626091184a31c4c5aeca3482362/set_response/

@@ -8,15 +8,14 @@ pub struct Args {
     #[arg(
         short,
         long,
-        default_value_t = 5,
-        help = "Interval in seconds between polls",
-        value_name = "SECONDS"
+        default_value_t = 59,
+        help = "Long poll timeout in seconds",
+        value_name = "TIMEOUT"
     )]
-    pub interval: u64,
+    pub timeout: u64,
 
     // Source URL to poll (GET request)
     #[arg(
-        short,
         long,
         default_value = "https://synapse.api.test.datamaker.io",
         help = "Source URL to poll for data",
@@ -26,7 +25,6 @@ pub struct Args {
 
     // URL to post to on successful poll
     #[arg(
-        short = 't',
         long,
         default_value = "http://localhost:8000",
         help = "Target URL to forward the response to",
@@ -35,16 +33,17 @@ pub struct Args {
     pub target_url: String,
 
     #[arg(
-        short = 'H',
-        long = "source-headers",
-        help = "Headers for Source URL as JSON string (e.g. '{\"Authorization\": \"Bearer token\", \"X-Custom\": \"value\"}'"
+        long,
+        default_value = "http://localhost:8000",
+        help = "Final URL to return the response to",
+        value_name = "FINAL_URL"
     )]
-    pub source_headers: Option<String>,
+    pub final_url: String,
 
     #[arg(
-        short = 'J',
-        long = "target-headers",
-        help = "Headers for Target URL as JSON string (e.g. '{\"Authorization\": \"Bearer token\", \"X-Custom\": \"value\"}'"
+        short = 'H',
+        long = "headers",
+        help = "Headers for Source URL as JSON string (e.g. '{\"Authorization\": \"Bearer token\", \"X-Custom\": \"value\"}'"
     )]
-    pub target_headers: Option<String>,
+    pub headers: Option<String>,
 }
