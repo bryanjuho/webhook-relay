@@ -17,7 +17,7 @@ pub struct Args {
     // Source URL to poll (GET request)
     #[arg(
         long,
-        default_value = "https://synapse.api.test.datamaker.io",
+        default_value = "http://localhost:8000",
         help = "Source URL to poll for data",
         value_name = "SOURCE_URL"
     )]
@@ -26,7 +26,7 @@ pub struct Args {
     // URL to post to on successful poll
     #[arg(
         long,
-        default_value = "http://localhost:8000",
+        default_value = "http://localhost:8005",
         help = "Target URL to forward the response to",
         value_name = "TARGET_URL"
     )]
