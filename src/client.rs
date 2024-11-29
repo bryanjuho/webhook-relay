@@ -1,9 +1,12 @@
 use std::time::Duration;
 
-use reqwest::{header::{HeaderMap, HeaderName, HeaderValue}, Client, StatusCode, Error};
+use log::{debug, error, info};
+use reqwest::{
+    header::{HeaderMap, HeaderName, HeaderValue},
+    Client, Error, StatusCode,
+};
 use serde_json::Value;
 use tokio::time::timeout;
-use log::{info, error};
 
 pub struct ApiClient {
     client: Client,
@@ -16,26 +19,30 @@ impl ApiClient {
         }
     }
 
-    pub async fn poll_url(&self, url: &str, headers: &HeaderMap, timeout_longpoll: Duration) -> Result<Value, Error> {
-        
+    pub async fn poll_url(
+        &self,
+        url: &str,
+        headers: &HeaderMap,
+        timeout_longpoll: Duration,
+    ) -> Result<Value, Error> {
         loop {
-            match timeout(timeout_longpoll, 
-                self.client.get(url)
-                    .headers(headers.clone())
-                    .send()
-            ).await {
+            match timeout(
+                timeout_longpoll,
+                self.client.get(url).headers(headers.clone()).send(),
+            )
+            .await
+            {
                 Ok(response_result) => {
                     match response_result {
                         Ok(response) => {
                             if response.status().is_success() {
-                                
                                 if let Ok(json) = response.json::<Value>().await {
                                     // If we got a non-empty JSON response, return it
                                     if !json.is_null() {
                                         return Ok(json);
                                     }
                                 }
-                            } 
+                            }
                             // 408 is the status code for a timeout
                             else if response.status().eq(&StatusCode::REQUEST_TIMEOUT) {
                                 info!("Connection timed out after 59 seconds, retrying...");
@@ -48,7 +55,7 @@ impl ApiClient {
                     }
                 }
                 Err(_) => {
-                    error!("Unexpected connection error, retrying...");
+                    debug!("Timed out, starting new request...");
                 }
             }
             tokio::time::sleep(Duration::from_secs(1)).await;
@@ -75,7 +82,7 @@ impl ApiClient {
                 }
             }
         }
-    
+
         // Build the request based on the method
         let request = match method.to_uppercase().as_str() {
             "GET" => self.client.get(&endpoint),
@@ -91,7 +98,7 @@ impl ApiClient {
                 return Err(err);
             }
         };
-    
+
         // Add headers and body to the request
         let request = request.headers(header_map);
         let request = if let Some(body_content) = body {
@@ -99,7 +106,7 @@ impl ApiClient {
         } else {
             request
         };
-    
+
         // Send the request and get JSON response
         let response = request.send().await?;
         Ok(response)

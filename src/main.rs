@@ -2,8 +2,8 @@ use std::error::Error;
 use std::time::Duration;
 
 use clap::Parser;
-use tokio::time::sleep;
 use log::{debug, error, info};
+use tokio::time::sleep;
 
 mod args;
 mod client;
@@ -16,7 +16,7 @@ use headers::build_headers;
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
-    let thread_count = 2;
+    let thread_count = 4;
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(thread_count)
         .enable_all()
@@ -40,7 +40,7 @@ async fn run_multi_thread(thread_count: usize) -> Result<(), Box<dyn Error>> {
         handles.push(handle);
         tokio::time::sleep(Duration::from_millis(100)).await;
     }
-    
+
     for handle in handles {
         handle.await.unwrap();
     }
@@ -54,8 +54,6 @@ async fn app(thread_id: u32) -> Result<(), Box<dyn std::error::Error>> {
 
     let timeout_longpoll = Duration::from_secs(args.timeout);
     let source_headers = build_headers(&args.headers)?;
-
-    debug!("Thread ID: {}", thread_id);
 
     loop {
         info!(
@@ -75,6 +73,7 @@ async fn app(thread_id: u32) -> Result<(), Box<dyn std::error::Error>> {
                 let endpoint = format!("{}{}", &args.target_url, request_path);
 
                 info!("Received {} API request: {}", request_method, request_id);
+                debug!("Thread {}: Request ID: {:?}", thread_id, request_id);
 
                 // Forward request to target URL
                 match client

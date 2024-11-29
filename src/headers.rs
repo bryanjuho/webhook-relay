@@ -22,10 +22,7 @@ fn parse_headers(json_str: &str) -> Result<HashMap<String, String>, Box<dyn std:
 pub fn build_headers(headers: &Option<String>) -> Result<HeaderMap, Box<dyn std::error::Error>> {
     let mut parsed_headers = HeaderMap::new();
 
-    parsed_headers.insert(
-        "Content-Type",
-        HeaderValue::from_static("application/json")
-    );
+    parsed_headers.insert("Content-Type", HeaderValue::from_static("application/json"));
 
     if let Some(header_json) = headers {
         let header_map = parse_headers(header_json)?;
